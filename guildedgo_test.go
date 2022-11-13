@@ -3,25 +3,19 @@ package guildedgo
 import (
 	"fmt"
 	"testing"
-
-	"github.com/itschip/guildedgo/utils"
 )
 
 func TestNewClient(t *testing.T) {
-	token := utils.GoDotEnvVariable("BOT_TOKEN")
-
 	config := &Config{
 		ServerID: "",
-		Token:    token,
+		Token:    "",
 	}
 
 	c := NewClient(config)
 
-	c.AddEventHander(messageCreate)
+	c.on("ChatMessageCreated", func(c *Client, cmc *interface{}) {
+		fmt.Println("cmc", cmc)
+	})
 
 	c.Open()
-}
-
-func messageCreate(c *Client, m *ChatMessageCreated) {
-	fmt.Println("Helllo message")
 }

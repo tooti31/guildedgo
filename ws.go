@@ -25,7 +25,7 @@ func (c *Client) Open() {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
-	conn, _, err := websocket.DefaultDialer.Dial("wss://api.guilded.gg/v1/websocket", header)
+	conn, _, err := websocket.DefaultDialer.Dial("wss://www.guilded.gg/websocket/v1", header)
 	if err != nil {
 		log.Fatalln("Failed to connect to websocket: ", err.Error())
 	}
@@ -43,7 +43,7 @@ func (c *Client) Open() {
 	}
 
 	m = bytes.TrimSpace(bytes.Replace(m, newline, space, -1))
-	fmt.Println(string(m))
+	//	fmt.Println(string(m))
 
 	listening := make(chan struct{})
 
@@ -57,7 +57,7 @@ func (c *Client) Open() {
 				return
 			}
 
-			onEvent(msg)
+			c.onEvent(msg)
 		}
 	}()
 
@@ -94,13 +94,43 @@ func (c *Client) Open() {
 	}
 }
 
-func onEvent(msg []byte) {
-	var chatMessage ChatMessageCreated
+var interfaces = make(map[string]interface{})
 
-	err := json.Unmarshal(msg, &chatMessage)
+func init() {
+	interfaces["ChatMessageCreated"] = &ChatMessage{}
+}
+
+type SocketMessage[T any] struct {
+	T string `json:"t"`
+	S string `json:"s"`
+	D string `json:"d"`
+}
+
+func (c *Client) onEvent(msg []byte) {
+	fmt.Println(string(msg))
+
+	var message SocketMessage[string]
+
+	err := json.Unmarshal(msg, &message)
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	fmt.Println("unmarshal message")
+	fmt.Println(message)
+
+	fmt.Println("message data")
+	fmt.Println([]byte(message.D))
+
+	eventInterface := interfaces[message.T]
+
+	err = json.Unmarshal([]byte(message.D), &eventInterface)
 	if err != nil {
 		log.Println("Failed to umarshal chat message event")
 	}
 
-	fmt.Print(chatMessage.D.Message.Content)
+	fmt.Println("eventInterface moment")
+	fmt.Println(eventInterface)
+
+	/*c.Events[message.T](c, &eventInterface) */
 }

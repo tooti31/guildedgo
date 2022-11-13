@@ -6,10 +6,17 @@ type Client struct {
 	Token    string
 	ServerID string
 	client   *http.Client
-	
+
 	Channel ChannelService
 	Members MembersService
 	Roles   RoleService
+
+	Events map[string]Event
+}
+
+type Event struct {
+	Callback func(*Client, *interface{})
+	Type     *interface{}
 }
 
 type Config struct {
@@ -23,10 +30,12 @@ func NewClient(config *Config) *Client {
 		ServerID: config.ServerID,
 		client:   http.DefaultClient,
 	}
-	
+
 	c.Channel = &channelService{client: c}
 	c.Members = &membersService{client: c}
 	c.Roles = &roleService{client: c}
-	
+
+	c.Events = make(map[string]Event)
+
 	return c
 }

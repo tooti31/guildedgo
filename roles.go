@@ -1,8 +1,9 @@
 package guildedgo
 
 import (
-	"github.com/itschip/guildedgo/internal/endpoints"
 	"log"
+
+	"github.com/itschip/guildedgo/internal/endpoints"
 )
 
 type RoleService interface {
@@ -18,7 +19,7 @@ var _ RoleService = &roleService{}
 
 func (rs *roleService) AddMemberToGroup(groupId string, userId string) {
 	endpoint := endpoints.GroupMemberEndpoint(groupId, userId)
-	
+
 	_, err := rs.client.PutRequest(endpoint, nil)
 	if err != nil {
 		log.Fatalln(err)
@@ -27,7 +28,7 @@ func (rs *roleService) AddMemberToGroup(groupId string, userId string) {
 
 func (rs *roleService) RemoveMemberFromGroup(groupId string, userId string) {
 	endpoint := endpoints.GroupMemberEndpoint(groupId, userId)
-	
+
 	_, err := rs.client.DeleteRequest(endpoint)
 	if err != nil {
 		log.Fatalln(err)
