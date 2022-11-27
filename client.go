@@ -15,7 +15,7 @@ type Client struct {
 }
 
 type Event struct {
-	Callback func(*Client, *interface{})
+	Callback func(*Client, any)
 	Type     *interface{}
 }
 

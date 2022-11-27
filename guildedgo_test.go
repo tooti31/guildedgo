@@ -13,8 +13,11 @@ func TestNewClient(t *testing.T) {
 
 	c := NewClient(config)
 
-	c.on("ChatMessageCreated", func(c *Client, cmc *interface{}) {
-		fmt.Println("cmc", cmc)
+	c.on("ChatMessageCreated", func(client *Client, e any) {
+		data, ok := e.(*ChatMessageCreated)
+		if ok {
+			fmt.Println("New message: ", data.Message.Content)
+		}
 	})
 
 	c.Open()

@@ -94,43 +94,35 @@ func (c *Client) Open() {
 	}
 }
 
-var interfaces = make(map[string]interface{})
+var interfaces = make(map[string]any)
 
 func init() {
-	interfaces["ChatMessageCreated"] = &ChatMessage{}
+	interfaces["ChatMessageCreated"] = &ChatMessageCreated{}
 }
 
-type SocketMessage[T any] struct {
-	T string `json:"t"`
-	S string `json:"s"`
-	D string `json:"d"`
+type RawEvent struct {
+	T    string          `json:"t"`
+	S    string          `json:"s"`
+	Data json.RawMessage `json:"d"`
 }
 
 func (c *Client) onEvent(msg []byte) {
-	fmt.Println(string(msg))
+	var err error
+	reader := bytes.NewBuffer(msg)
 
-	var message SocketMessage[string]
+	var re *RawEvent
+	decoder := json.NewDecoder(reader)
 
-	err := json.Unmarshal(msg, &message)
+	err = decoder.Decode(&re)
 	if err != nil {
-		log.Println(err.Error())
+		log.Println("Failed to decode raw event")
 	}
 
-	fmt.Println("unmarshal message")
-	fmt.Println(message)
-
-	fmt.Println("message data")
-	fmt.Println([]byte(message.D))
-
-	eventInterface := interfaces[message.T]
-
-	err = json.Unmarshal([]byte(message.D), &eventInterface)
+	eventType := interfaces[re.T]
+	err = json.Unmarshal(re.Data, eventType)
 	if err != nil {
-		log.Println("Failed to umarshal chat message event")
+		log.Printf("Failed to unmarshal data. Error: %s", err.Error())
 	}
 
-	fmt.Println("eventInterface moment")
-	fmt.Println(eventInterface)
-
-	/*c.Events[message.T](c, &eventInterface) */
+	c.Events["ChatMessageCreated"].Callback(c, eventType)
 }
