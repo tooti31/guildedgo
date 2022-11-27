@@ -1,14 +1,18 @@
 package guildedgo
 
 import (
-	"fmt"
 	"testing"
+
+	"github.com/itschip/guildedgo/internal"
 )
 
 func TestNewClient(t *testing.T) {
+	serverID := internal.GetEnv("SERVER_ID")
+	token := internal.GetEnv("TOKEN")
+
 	config := &Config{
-		ServerID: "",
-		Token:    "",
+		ServerID: serverID,
+		Token:    token,
 	}
 
 	c := NewClient(config)
@@ -16,7 +20,11 @@ func TestNewClient(t *testing.T) {
 	c.on("ChatMessageCreated", func(client *Client, e any) {
 		data, ok := e.(*ChatMessageCreated)
 		if ok {
-			fmt.Println("New message: ", data.Message.Content)
+			if data.Message.Content == "!ping" {
+				client.Channel.SendMessage(data.Message.ChannelID, &MessageObject{
+					Content: "Pong!",
+				})
+			}
 		}
 	})
 

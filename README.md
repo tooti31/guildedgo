@@ -12,9 +12,12 @@ go get github.com/itschip/guildedgo
 
 ```go
 func main() {
+    serverID := GetEnv("SERVER_ID")
+	token := GetEnv("TOKEN")
+
 	config := &Config{
-		ServerID: "",
-		Token:    "",
+		ServerID: serverID,
+		Token:    token,
 	}
 
 	c := NewClient(config)
@@ -22,7 +25,11 @@ func main() {
 	c.on("ChatMessageCreated", func(client *Client, e any) {
 		data, ok := e.(*ChatMessageCreated)
 		if ok {
-			fmt.Println("New message: ", data.Message.Content)
+			if data.Message.Content == "!ping" {
+				client.Channel.SendMessage(data.Message.ChannelID, &MessageObject{
+					Content: "Pong!",
+				})
+			}
 		}
 	})
 
