@@ -124,5 +124,5 @@ func (c *Client) onEvent(msg []byte) {
 		log.Printf("Failed to unmarshal data. Error: %s", err.Error())
 	}
 
-	c.Events["ChatMessageCreated"].Callback(c, eventType)
+	c.Events[re.T].Callback(c, eventType)
 }

@@ -1,6 +1,7 @@
 package guildedgo
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/itschip/guildedgo/internal"
@@ -17,7 +18,7 @@ func TestNewClient(t *testing.T) {
 
 	c := NewClient(config)
 
-	c.on("ChatMessageCreated", func(client *Client, e any) {
+	c.On("ChatMessageCreated", func(client *Client, e any) {
 		data, ok := e.(*ChatMessageCreated)
 		if ok {
 			if data.Message.Content == "!ping" {
@@ -26,6 +27,10 @@ func TestNewClient(t *testing.T) {
 				})
 			}
 		}
+	})
+
+	c.Command("!kick", func(client *Client, v *ChatMessageCreated) {
+		fmt.Println("You are kicked!", v.Message.CreatedBy)
 	})
 
 	c.Open()
