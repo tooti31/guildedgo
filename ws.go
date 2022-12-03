@@ -98,6 +98,7 @@ var interfaces = make(map[string]any)
 
 func init() {
 	interfaces["ChatMessageCreated"] = &ChatMessageCreated{}
+	interfaces["ServerChannelCreated"] = &ServerChannelCreated{}
 }
 
 type RawEvent struct {
@@ -124,5 +125,8 @@ func (c *Client) onEvent(msg []byte) {
 		log.Printf("Failed to unmarshal data. Error: %s", err.Error())
 	}
 
-	c.Events[re.T].Callback(c, eventType)
+	eventCB := c.Events[re.T]
+	if eventCB.Callback != nil {
+		eventCB.Callback(c, eventType)
+	}
 }

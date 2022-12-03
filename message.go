@@ -50,7 +50,10 @@ type ChannelMessage struct {
 }
 
 type MessageObject struct {
-	Content string `json:"content"`
+	Content         string `json:"content,omitempty"`
+	IsPrivate       string `json:"isPrivate,omitempty"`
+	IsSilent        string `json:"isSilent,omitempty"`
+	ReplyMessageIds string `json:"replyMessageIds,omitempty"`
 }
 
 type MessageResponse struct {
@@ -58,7 +61,7 @@ type MessageResponse struct {
 }
 
 type GetMessageResponse struct {
-	Message ChannelMessage `json:"message"`
+	Message ChatMessage `json:"message"`
 }
 
 type GetMessagesObject struct {
@@ -69,5 +72,5 @@ type GetMessagesObject struct {
 }
 
 type AllMessagesResponse struct {
-	Messages []ChannelMessage `json:"messages"`
+	Messages []ChatMessage `json:"messages"`
 }

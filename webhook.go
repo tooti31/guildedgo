@@ -15,3 +15,8 @@ type ChatMessageCreated struct {
 	ServerID string      `json:"serverId"`
 	Message  ChatMessage `json:"message"`
 }
+
+type ServerChannelCreated struct {
+	ServerID string        `json:"serverId"`
+	Channel  ServerChannel `json:"channel"`
+}

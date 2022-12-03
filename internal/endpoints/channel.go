@@ -5,6 +5,12 @@ import (
 )
 
 var (
+	CreateChannelEndpoint = func() string {
+		return internal.GuildedApi + "/channels"
+	}
+	GetChannelEndpoint = func(channelId string) string {
+		return internal.GuildedApi + "/channels/" + channelId
+	}
 	CreateMessageEndpoint = func(channelId string) string {
 		return internal.GuildedApi + "/channels/" + channelId + "/messages"
 	}

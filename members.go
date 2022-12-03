@@ -70,7 +70,6 @@ func (ms *membersService) UpdateMemberNickname(userId string, nickname string) (
 	}
 
 	resp, err := ms.client.PutRequest(endpoint, body)
-
 	if err != nil {
 		log.Fatalln(err.Error())
 		return nil, err

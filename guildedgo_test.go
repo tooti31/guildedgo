@@ -2,6 +2,7 @@ package guildedgo
 
 import (
 	"fmt"
+	"log"
 	"testing"
 
 	"github.com/itschip/guildedgo/internal"
@@ -29,8 +30,13 @@ func TestNewClient(t *testing.T) {
 		}
 	})
 
-	c.Command("!kick", func(client *Client, v *ChatMessageCreated) {
-		fmt.Println("You are kicked!", v.Message.CreatedBy)
+	c.Command("!create", func(client *Client, v *ChatMessageCreated) {
+		channel, err := c.Channel.GetChannel("a6bc58e4-9d63-4290-b674-d8f18ecb28fb")
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		fmt.Println(channel)
 	})
 
 	c.Open()
