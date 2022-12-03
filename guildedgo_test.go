@@ -39,5 +39,16 @@ func TestNewClient(t *testing.T) {
 		fmt.Println(channel)
 	})
 
+	c.Command("!update", func(client *Client, v *ChatMessageCreated) {
+		channel, err := c.Channel.UpdateChannel("a6bc58e4-9d63-4290-b674-d8f18ecb28fb", &UpdateChannelObject{
+			Name: "worst channel",
+		})
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		fmt.Println("New name: ", channel.Name)
+	})
+
 	c.Open()
 }

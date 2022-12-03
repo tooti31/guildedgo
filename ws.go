@@ -99,6 +99,7 @@ var interfaces = make(map[string]any)
 func init() {
 	interfaces["ChatMessageCreated"] = &ChatMessageCreated{}
 	interfaces["ServerChannelCreated"] = &ServerChannelCreated{}
+	interfaces["ServerChannelUpdated"] = &ServerChannelUpdated{}
 }
 
 type RawEvent struct {

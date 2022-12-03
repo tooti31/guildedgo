@@ -35,6 +35,12 @@ type NewChannelObject struct {
 	CategoryID string `json:"categoryId,omitempty"`
 }
 
+type UpdateChannelObject struct {
+	Name     string `json:"name,omitempty"`
+	Topic    string `json:"topic,omitempty"`
+	IsPublic string `json:"isTopic,omitempty"`
+}
+
 type ServerChannelResponse struct {
 	Channel ServerChannel `json:"channel"`
 }
@@ -42,6 +48,7 @@ type ServerChannelResponse struct {
 type ChannelService interface {
 	CreateChannel(channelObject *NewChannelObject) (*ServerChannel, error)
 	GetChannel(channelId string) (*ServerChannel, error)
+	UpdateChannel(channelId string, channelObject *UpdateChannelObject) (*ServerChannel, error)
 	SendMessage(channelId string, message *MessageObject) (*ChatMessage, error)
 	GetMessages(channelId string, getObject *GetMessagesObject) (*[]ChatMessage, error)
 	GetMessage(channelId string, messageId string) (*ChatMessage, error)
@@ -56,7 +63,7 @@ type channelService struct {
 var _ ChannelService = &channelService{}
 
 func (cs *channelService) CreateChannel(channelObject *NewChannelObject) (*ServerChannel, error) {
-	endpoint := endpoints.CreateChannelEndpoint()
+	endpoint := endpoints.ChannelEndpoint()
 
 	channelObject.ServerID = cs.client.ServerID
 
@@ -75,15 +82,27 @@ func (cs *channelService) CreateChannel(channelObject *NewChannelObject) (*Serve
 }
 
 func (cs *channelService) GetChannel(channelId string) (*ServerChannel, error) {
-	endpoint := endpoints.GetChannelEndpoint(channelId)
+	endpoint := endpoints.ChannelEndpointWithID(channelId)
 
 	var serverChannel ServerChannelResponse
-	_, err := cs.client.GetRequestV2(endpoint, &serverChannel)
+	err := cs.client.GetRequestV2(endpoint, &serverChannel)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Failed to get channel. Error: \n%v", err.Error()))
 	}
 
 	log.Println(serverChannel.Channel.Name)
+
+	return &serverChannel.Channel, nil
+}
+
+func (cs *channelService) UpdateChannel(channelId string, channelObject *UpdateChannelObject) (*ServerChannel, error) {
+	endpoint := endpoints.ChannelEndpointWithID(channelId)
+
+	var serverChannel ServerChannelResponse
+	err := cs.client.PatchRequest(endpoint, &channelObject, &serverChannel)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("Failed to update  channel. Error: \n%v", err.Error()))
+	}
 
 	return &serverChannel.Channel, nil
 }

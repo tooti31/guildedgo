@@ -17,6 +17,38 @@ func (c *Client) PostRequest(endpoint string, body interface{}) ([]byte, error) 
 	return resp, nil
 }
 
+func (c *Client) PostRequestV2(endpoint string, body any, v any) error {
+	jsonBody, _ := json.Marshal(&body)
+
+	resp, err := internal.DoRequest("POST", endpoint, jsonBody, c.Token)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(resp, &v)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) PatchRequest(endpoint string, body any, v any) error {
+	jsonBody, _ := json.Marshal(&body)
+
+	resp, err := internal.DoRequest("PATCH", endpoint, jsonBody, c.Token)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(resp, &v)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (c *Client) GetRequest(endpoint string) ([]byte, error) {
 	resp, err := internal.DoRequest("GET", endpoint, nil, c.Token)
 	if err != nil {
@@ -26,18 +58,18 @@ func (c *Client) GetRequest(endpoint string) ([]byte, error) {
 	return resp, nil
 }
 
-func (c *Client) GetRequestV2(endpoint string, v any) ([]byte, error) {
+func (c *Client) GetRequestV2(endpoint string, v any) error {
 	resp, err := internal.DoRequest("GET", endpoint, nil, c.Token)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	err = json.Unmarshal(resp, &v)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return resp, nil
+	return nil
 }
 
 func (c *Client) PutRequest(endpoint string, body interface{}) ([]byte, error) {

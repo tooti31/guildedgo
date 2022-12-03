@@ -20,3 +20,8 @@ type ServerChannelCreated struct {
 	ServerID string        `json:"serverId"`
 	Channel  ServerChannel `json:"channel"`
 }
+
+type ServerChannelUpdated struct {
+	ServerID string        `json:"serverId"`
+	Channel  ServerChannel `json:"channel"`
+}
