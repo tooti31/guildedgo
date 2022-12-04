@@ -36,3 +36,22 @@ func main() {
 	c.Open()
 }
 ```
+
+## TODO
+- [x] Channels
+- [x] Servers
+- [x] Messaging
+- [x] Members
+- [x] Member bans
+- [ ] Forums
+- [ ] Forum comments
+- [ ] List items
+- [ ] Docs
+- [ ] Calendar events
+- [ ] Reactions
+- [ ] Server XP
+- [ ] Social links
+- [ ] Group membership
+- [ ] Role membership
+- [ ] Webhooks
+- [ ] Emote
