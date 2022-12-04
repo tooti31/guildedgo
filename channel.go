@@ -24,6 +24,38 @@ type ServerChannel struct {
 	ArchivedAt string `json:"archivedAt"`
 }
 
+type Mentions struct {
+	// Info on mentioned users (min items 1)
+	Users MentionsUser `json:"users,omitempty"`
+
+	// Info on mentioned channels (min items 1)
+	Channels []MentionsChannel `json:"channels,omitempty"`
+
+	// Info on mentioned roles (min items 1)
+	Roles []MentionsRole `json:"roles,omitempty"`
+
+	// If @everyone was mentioned
+	Everyone bool `json:"everyone,omitempty"`
+
+	// If @here was mentioned
+	Here bool `json:"here,omitempty"`
+}
+
+type MentionsRole struct {
+	// The ID of the role
+	ID int `json:"id"`
+}
+
+type MentionsChannel struct {
+	// The ID of the channel
+	ID string `json:"id"`
+}
+
+type MentionsUser struct {
+	// The ID of the user
+	ID string `json:"id"`
+}
+
 type NewChannelObject struct {
 	Name       string `json:"name"`
 	Topic      string `json:"topic,omitempty"`
