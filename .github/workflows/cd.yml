@@ -20,5 +20,7 @@ jobs:
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          repo_token: "${{ secrets.CD_SECRET }}"
-          prerelease: false
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          title: "Guildedgo dev release"
+          automatic_release_tag: "latest"'
+          prerelease: true
