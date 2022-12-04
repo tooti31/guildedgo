@@ -18,9 +18,9 @@ jobs:
         with:
           go-version: 1.19
 
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - uses: "marvinpinto/action-automatic-releases@v1.2.1"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           title: "Guildedgo dev release"
           automatic_release_tag: "latest"
-          prerelease: true
+          prerelease: false
