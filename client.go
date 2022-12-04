@@ -10,8 +10,8 @@ type Client struct {
 	Channel ChannelService
 	Members MembersService
 	Roles   RoleService
-
-	Events map[string]Event
+	Server  ServerService
+	Events  map[string]Event
 }
 
 type Event struct {
@@ -34,6 +34,7 @@ func NewClient(config *Config) *Client {
 	c.Channel = &channelService{client: c}
 	c.Members = &membersService{client: c}
 	c.Roles = &roleService{client: c}
+	c.Server = &serverService{client: c}
 
 	c.Events = make(map[string]Event)
 

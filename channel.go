@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 
 	"github.com/itschip/guildedgo/internal/endpoints"
 )
@@ -49,6 +48,7 @@ type ChannelService interface {
 	CreateChannel(channelObject *NewChannelObject) (*ServerChannel, error)
 	GetChannel(channelId string) (*ServerChannel, error)
 	UpdateChannel(channelId string, channelObject *UpdateChannelObject) (*ServerChannel, error)
+	DeleteChannel(channelId string) error
 	SendMessage(channelId string, message *MessageObject) (*ChatMessage, error)
 	GetMessages(channelId string, getObject *GetMessagesObject) (*[]ChatMessage, error)
 	GetMessage(channelId string, messageId string) (*ChatMessage, error)
@@ -62,6 +62,8 @@ type channelService struct {
 
 var _ ChannelService = &channelService{}
 
+// CreateChannel returns the newly created channel.
+// Only server channels are supported at this time (coming soon™: DM Channels!)
 func (cs *channelService) CreateChannel(channelObject *NewChannelObject) (*ServerChannel, error) {
 	endpoint := endpoints.ChannelEndpoint()
 
@@ -81,6 +83,8 @@ func (cs *channelService) CreateChannel(channelObject *NewChannelObject) (*Serve
 	return &serverChannel.Channel, nil
 }
 
+// GetChannel returns a channel by channelId.
+// Only server channels are supported at this time (coming soon™: DM Channels!)
 func (cs *channelService) GetChannel(channelId string) (*ServerChannel, error) {
 	endpoint := endpoints.ChannelEndpointWithID(channelId)
 
@@ -90,11 +94,11 @@ func (cs *channelService) GetChannel(channelId string) (*ServerChannel, error) {
 		return nil, errors.New(fmt.Sprintf("Failed to get channel. Error: \n%v", err.Error()))
 	}
 
-	log.Println(serverChannel.Channel.Name)
-
 	return &serverChannel.Channel, nil
 }
 
+// UpdateChannel returns the updated channel.
+// Only server channels are supported at this time (coming soon™: DM Channels!)
 func (cs *channelService) UpdateChannel(channelId string, channelObject *UpdateChannelObject) (*ServerChannel, error) {
 	endpoint := endpoints.ChannelEndpointWithID(channelId)
 
@@ -105,6 +109,18 @@ func (cs *channelService) UpdateChannel(channelId string, channelObject *UpdateC
 	}
 
 	return &serverChannel.Channel, nil
+}
+
+// DeleteChannel does not return anything
+// Only server channels are supported at this time (coming soon™: DM Channels!)
+func (cs *channelService) DeleteChannel(channelId string) error {
+	endpoint := endpoints.ChannelEndpointWithID(channelId)
+	_, err := cs.client.DeleteRequest(endpoint)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Failed to delete channel. Error: \n%v", err.Error()))
+	}
+
+	return nil
 }
 
 func (cs *channelService) SendMessage(channelId string, message *MessageObject) (*ChatMessage, error) {

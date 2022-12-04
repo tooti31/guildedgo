@@ -50,5 +50,14 @@ func TestNewClient(t *testing.T) {
 		fmt.Println("New name: ", channel.Name)
 	})
 
+	c.Command("!getinfo", func(client *Client, v *ChatMessageCreated) {
+		server, err := client.Server.GetServer(v.ServerID)
+		if err != nil {
+			log.Println(err.Error())
+		}
+
+		fmt.Println(server)
+	})
+
 	c.Open()
 }
