@@ -1,15 +1,17 @@
 package guildedgo
 
 import (
+	"bytes"
 	"encoding/json"
-
-	"github.com/itschip/guildedgo/internal"
+	"errors"
+	"io/ioutil"
+	"net/http"
 )
 
 func (c *Client) PostRequest(endpoint string, body interface{}) ([]byte, error) {
 	jsonBody, _ := json.Marshal(&body)
 
-	resp, err := internal.DoRequest("POST", endpoint, jsonBody, c.Token)
+	resp, err := DoRequest("POST", endpoint, jsonBody, c.Token)
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +22,7 @@ func (c *Client) PostRequest(endpoint string, body interface{}) ([]byte, error) 
 func (c *Client) PostRequestV2(endpoint string, body any, v any) error {
 	jsonBody, _ := json.Marshal(&body)
 
-	resp, err := internal.DoRequest("POST", endpoint, jsonBody, c.Token)
+	resp, err := DoRequest("POST", endpoint, jsonBody, c.Token)
 	if err != nil {
 		return err
 	}
@@ -36,7 +38,7 @@ func (c *Client) PostRequestV2(endpoint string, body any, v any) error {
 func (c *Client) PatchRequest(endpoint string, body any, v any) error {
 	jsonBody, _ := json.Marshal(&body)
 
-	resp, err := internal.DoRequest("PATCH", endpoint, jsonBody, c.Token)
+	resp, err := DoRequest("PATCH", endpoint, jsonBody, c.Token)
 	if err != nil {
 		return err
 	}
@@ -50,7 +52,7 @@ func (c *Client) PatchRequest(endpoint string, body any, v any) error {
 }
 
 func (c *Client) GetRequest(endpoint string) ([]byte, error) {
-	resp, err := internal.DoRequest("GET", endpoint, nil, c.Token)
+	resp, err := DoRequest("GET", endpoint, nil, c.Token)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +61,7 @@ func (c *Client) GetRequest(endpoint string) ([]byte, error) {
 }
 
 func (c *Client) GetRequestV2(endpoint string, v any) error {
-	resp, err := internal.DoRequest("GET", endpoint, nil, c.Token)
+	resp, err := DoRequest("GET", endpoint, nil, c.Token)
 	if err != nil {
 		return err
 	}
@@ -75,7 +77,7 @@ func (c *Client) GetRequestV2(endpoint string, v any) error {
 func (c *Client) PutRequest(endpoint string, body interface{}) ([]byte, error) {
 	jsonBody, _ := json.Marshal(&body)
 
-	resp, err := internal.DoRequest("PUT", endpoint, jsonBody, c.Token)
+	resp, err := DoRequest("PUT", endpoint, jsonBody, c.Token)
 	if err != nil {
 		return nil, err
 	}
@@ -84,10 +86,59 @@ func (c *Client) PutRequest(endpoint string, body interface{}) ([]byte, error) {
 }
 
 func (c *Client) DeleteRequest(endpoint string) ([]byte, error) {
-	resp, err := internal.DoRequest("DELETE", endpoint, nil, c.Token)
+	resp, err := DoRequest("DELETE", endpoint, nil, c.Token)
 	if err != nil {
 		return nil, err
 	}
 
 	return resp, nil
+}
+
+type responseError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+func DoRequest(method string, endpoint string, body []byte, token string) ([]byte, error) {
+	request, err := http.NewRequest(method, endpoint, bytes.NewBuffer(body))
+	request.Header.Set("Authorization", "Bearer "+token)
+	request.Header.Set("Content-Type", "application/json")
+
+	// Handle status codes - remember rate limiting
+	resp, err := do(request)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func do(req *http.Request) ([]byte, error) {
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	switch resp.StatusCode {
+	case http.StatusBadGateway:
+	case http.StatusForbidden:
+	case http.StatusBadRequest:
+		var resError responseError
+
+		err := json.Unmarshal(body, &resError)
+		if err != nil {
+			return nil, err
+		}
+
+		return nil, errors.New(resError.Message)
+	}
+
+	return body, nil
 }

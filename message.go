@@ -126,10 +126,22 @@ type ChatEmbedField struct {
 }
 
 type MessageObject struct {
-	Content         string `json:"content,omitempty"`
-	IsPrivate       string `json:"isPrivate,omitempty"`
-	IsSilent        string `json:"isSilent,omitempty"`
-	ReplyMessageIds string `json:"replyMessageIds,omitempty"`
+	// If set, this message will only be seen by those mentioned or replied to
+	IsPrivate string `json:"isPrivate,omitempty"`
+
+	// If set, this message will not notify any mentioned users or roles (default false)
+	IsSilent string `json:"isSilent,omitempty"`
+
+	// Message IDs to reply to (min items 1; max items 5)
+	ReplyMessageIds []string `json:"replyMessageIds,omitempty"`
+
+	// The content of the message (min length 1; max length 4000)
+	Content string `json:"content,omitempty"`
+
+	// At this time, only one embed is supported per message, and attachments are not supported.
+	// If you need to send more than one embed or upload attachments, consider creating the
+	// message via a webhook. (min items 1; max items 1)
+	Embeds []ChatEmbed `json:"embeds,omitempty"`
 }
 
 type MessageResponse struct {

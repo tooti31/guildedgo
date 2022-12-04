@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/itschip/guildedgo/internal/endpoints"
+	"github.com/itschip/guildedgo/endpoints"
 )
 
 type ServerChannel struct {

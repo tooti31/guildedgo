@@ -2,44 +2,78 @@ package guildedgo
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"log"
 
-	"github.com/itschip/guildedgo/internal/endpoints"
+	"github.com/itschip/guildedgo/endpoints"
 )
 
 type ServerMember struct {
-	User     User   `json:"user"`
-	RoleIds  []int  `json:"roleIds"`
-	Nickname string `json:"nickname"`
+	User User `json:"user"`
+
+	// (must have unique items true)
+	RoleIds []int `json:"roleIds"`
+
+	Nickname string `json:"nickname,omitempty"`
+
+	// The ISO 8601 timestamp that the member was created at
 	JoinedAt string `json:"joinedAt"`
+
+	// (default false)
+	IsOwner bool `json:"isOwner,omitempty"`
 }
 
 type ServerMemberSummary struct {
-	User    User  `json:"user"`
+	User UserSummary `json:"user"`
+
+	// (must have unique items true)
 	RoleIds []int `json:"roleIds"`
 }
 
 type User struct {
-	Id        string `json:"id"`
-	Type      string `json:"type"`
-	Name      string `json:"name"`
+	// The ID of the user
+	Id string `json:"id"`
+
+	// The type of user. If this property is absent, it can assumed to be of type user
+	Type string `json:"type,omitempty"`
+
+	Name string `json:"name"`
+
+	// The avatar image associated with the user
+	Avatar string `json:"avatar,omitempty"`
+
+	// The banner image associated with the user
+	Banner string `json:"banner,omitempty"`
+
+	// The ISO 8601 timestamp that the user was created at
 	CreatedAt string `json:"createdAt"`
 }
 
 type UserSummary struct {
-	Id   string `json:"id"`
-	Type string `json:"type"`
+	// The ID of the user
+	Id string `json:"id"`
+
+	//  The type of user. If this property is absent, it can assumed to be of type user
+	Type string `json:"type,omitempty"`
+
 	Name string `json:"name"`
+
+	// The avatar image associated with the user
+	Avatar string `json:"avatar,omitempty"`
 }
 
 type ServerMemberBan struct {
-	User      User   `json:"user"`
-	Reason    string `json:"reason"`
+	User UserSummary `json:"user"`
+
+	// The reason for the ban as submitted by the banner
+	Reason string `json:"reason,omitempty"`
+
+	// The ID of the user who created this server member ban
+	CreatedBy string `json:"createdBy"`
+
+	// The ISO 8601 timestamp that the server member ban was created at
 	CreatedAt string `json:"createdAt"`
-	/*
-		The ID of the user who banned
-	*/
-	CreatedBy string `json:"created_by"`
 }
 
 type NicknameResponse struct {
@@ -52,8 +86,13 @@ type ServerMemberResponse struct {
 
 type MembersService interface {
 	UpdateMemberNickname(userId string, nickname string) (*NicknameResponse, error)
+	DeleteMemberNickname(userId string) error
 	GetServerMember(serverId string, userId string) (*ServerMember, error)
 	KickMember(userId string) error
+	BanMember(userId string, reason string) (*ServerMemberBan, error)
+	IsMemberBanned(userId string) (*ServerMemberBan, error)
+	UnbanMember(userId string) error
+	GetServerMembers() (*[]ServerMemberSummary, error)
 }
 
 type membersService struct {
@@ -63,7 +102,7 @@ type membersService struct {
 var _ MembersService = &membersService{}
 
 func (ms *membersService) UpdateMemberNickname(userId string, nickname string) (*NicknameResponse, error) {
-	endpoint := endpoints.UpdateMemberNicknameEndpoint(ms.client.ServerID, userId)
+	endpoint := endpoints.MemberNicknameEndpoint(ms.client.ServerID, userId)
 
 	body := &NicknameResponse{
 		Nickname: nickname,
@@ -71,7 +110,6 @@ func (ms *membersService) UpdateMemberNickname(userId string, nickname string) (
 
 	resp, err := ms.client.PutRequest(endpoint, body)
 	if err != nil {
-		log.Fatalln(err.Error())
 		return nil, err
 	}
 
@@ -79,27 +117,31 @@ func (ms *membersService) UpdateMemberNickname(userId string, nickname string) (
 
 	err = json.Unmarshal(resp, &nick)
 	if err != nil {
-		log.Fatalln(err.Error())
 		return nil, err
 	}
 
 	return &nick, nil
 }
 
+func (ms *membersService) DeleteMemberNickname(userId string) error {
+	endpoint := endpoints.MemberNicknameEndpoint(ms.client.ServerID, userId)
+
+	_, err := ms.client.DeleteRequest(endpoint)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Failed to delete member nickname. Error: %s", err.Error()))
+	}
+
+	return nil
+}
+
 func (ms *membersService) GetServerMember(serverId string, userId string) (*ServerMember, error) {
 	endpoint := endpoints.ServerMemberEndpoint(serverId, userId)
 
-	resp, err := ms.client.GetRequest(endpoint)
+	var member ServerMemberResponse
+	err := ms.client.GetRequestV2(endpoint, &member)
 	if err != nil {
 		log.Println(err.Error())
-		return nil, err
-	}
-
-	var member ServerMemberResponse
-	err = json.Unmarshal(resp, &member)
-	if err != nil {
-		log.Fatalln(err.Error())
-		return nil, err
+		return nil, errors.New(fmt.Sprintf("Failed to get member. Error: %s", err.Error()))
 	}
 
 	return &member.Member, nil
@@ -108,11 +150,9 @@ func (ms *membersService) GetServerMember(serverId string, userId string) (*Serv
 func (ms *membersService) KickMember(userId string) error {
 	endpoint := endpoints.ServerMemberEndpoint(ms.client.ServerID, userId)
 
-	// No response. Maybe ther'e be one in the future
 	_, err := ms.client.DeleteRequest(endpoint)
 	if err != nil {
-		log.Fatalln(err.Error())
-		return err
+		return errors.New(fmt.Sprintf("Failed to kick member. Error: %s", err.Error()))
 	}
 
 	return nil
@@ -126,16 +166,9 @@ func (ms *membersService) BanMember(userId string, reason string) (*ServerMember
 		"reason": reason,
 	}
 
-	resp, err := ms.client.PostRequest(endpoint, body)
-	if err != nil {
-		log.Fatalln(err.Error())
-		return nil, err
-	}
-
 	var ban ServerMemberBan
-	err = json.Unmarshal(resp, &ban)
+	err := ms.client.PostRequestV2(endpoint, body, &ban)
 	if err != nil {
-		log.Fatalln(err.Error())
 		return nil, err
 	}
 
@@ -146,16 +179,9 @@ func (ms *membersService) IsMemberBanned(userId string) (*ServerMemberBan, error
 	// Do we want to use the serverID from the config, or manually input it?
 	endpoint := endpoints.ServerMemberEndpoint(ms.client.ServerID, userId)
 
-	resp, err := ms.client.GetRequest(endpoint)
-	if err != nil {
-		log.Fatalln(err.Error())
-		return nil, err
-	}
-
 	var ban ServerMemberBan
-	err = json.Unmarshal(resp, &ban)
+	err := ms.client.GetRequestV2(endpoint, &ban)
 	if err != nil {
-		log.Fatalln(err.Error())
 		return nil, err
 	}
 
@@ -177,16 +203,9 @@ func (ms *membersService) UnbanMember(userId string) error {
 func (ms *membersService) GetServerMembers() (*[]ServerMemberSummary, error) {
 	endpoint := endpoints.MemberEndpoint(ms.client.ServerID)
 
-	resp, err := ms.client.GetRequest(endpoint)
-	if err != nil {
-		log.Fatalln(err.Error())
-		return nil, err
-	}
-
 	var members []ServerMemberSummary
-	err = json.Unmarshal(resp, &members)
+	err := ms.client.GetRequestV2(endpoint, &members)
 	if err != nil {
-		log.Fatalln(err.Error())
 		return nil, err
 	}
 

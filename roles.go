@@ -3,7 +3,7 @@ package guildedgo
 import (
 	"log"
 
-	"github.com/itschip/guildedgo/internal/endpoints"
+	"github.com/itschip/guildedgo/endpoints"
 )
 
 type RoleService interface {

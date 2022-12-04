@@ -42,6 +42,7 @@ func do(req *http.Request) ([]byte, error) {
 
 	switch resp.StatusCode {
 	case http.StatusBadGateway:
+	case http.StatusForbidden:
 	case http.StatusBadRequest:
 		var resError responseError
 

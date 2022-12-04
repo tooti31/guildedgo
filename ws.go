@@ -97,7 +97,16 @@ func (c *Client) Open() {
 var interfaces = make(map[string]any)
 
 func init() {
+	interfaces["BotServerMembershipCreated"] = &BotServerMembershipCreated{}
+	interfaces["BotServerMembershipDeleted"] = &BotServerMembershipDeleted{}
 	interfaces["ChatMessageCreated"] = &ChatMessageCreated{}
+	interfaces["ChatMessageUpdated"] = &ChatMessageUpdated{}
+	interfaces["ChatMessageDeleted"] = &ChatMessageDeleted{}
+	interfaces["ServerMemberJoined"] = &ServerMemberJoined{}
+	interfaces["ServerMemberRemoved"] = &ServerMemberRemoved{}
+	interfaces["ServerMemberBanned"] = &ServerMemberBanned{}
+	interfaces["ServerMemberUnbanned"] = &ServerMemberUnbanned{}
+
 	interfaces["ServerChannelCreated"] = &ServerChannelCreated{}
 	interfaces["ServerChannelUpdated"] = &ServerChannelUpdated{}
 }
@@ -123,7 +132,7 @@ func (c *Client) onEvent(msg []byte) {
 	eventType := interfaces[re.T]
 	err = json.Unmarshal(re.Data, eventType)
 	if err != nil {
-		log.Printf("Failed to unmarshal data. Error: %s", err.Error())
+		log.Printf("Failed to unmarshal event data for %q. Error: %s", re.T, err.Error())
 	}
 
 	eventCB := c.Events[re.T]
