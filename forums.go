@@ -1,5 +1,12 @@
 package guildedgo
 
+import (
+	"errors"
+	"fmt"
+
+	"github.com/itschip/guildedgo/endpoints"
+)
+
 type ForumTopic struct {
 	// The ID of the forum topic
 	ID string `json:"id"`
@@ -79,4 +86,42 @@ type ForumTopicSummary struct {
 
 	// (default false)
 	IsLocked bool `json:"isLocked,omitempty"`
+}
+
+type ForumTopicObject struct {
+	Title   string `json:"title"`
+	Content string `json:"content"`
+}
+
+type ForumService interface{}
+
+type forumService struct {
+	client *Client
+}
+
+var _ ForumService = &forumService{}
+
+func (f *forumService) CreateForumTopic(channelId string, forumTopicObject *ForumTopicObject) (*ForumTopic, error) {
+	endpoint := endpoints.ForumTopicEndpoint(channelId)
+
+	var forumTopic ForumTopic
+	err := f.client.PostRequestV2(endpoint, &forumTopicObject, &forumTopic)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("Failed to create new forum topic. Error: \n%v", err.Error()))
+	}
+
+	return &forumTopic, nil
+}
+
+func (f *forumService) GetForumTopics(channelId string) (*[]ForumTopicSummary, error) {
+	endpoint := endpoints.ForumTopicEndpoint(channelId)
+
+	var forumTopicSummary []ForumTopicSummary
+
+	err := f.client.GetRequestV2(endpoint, &forumTopicSummary)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("Failed to get forum topics. Error: \n%v", err.Error()))
+	}
+
+	return &forumTopicSummary, nil
 }
