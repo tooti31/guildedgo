@@ -88,6 +88,17 @@ type ForumTopicSummary struct {
 	IsLocked bool `json:"isLocked,omitempty"`
 }
 
+type ForumTopicComment struct {
+	ID           int    `json:"id"`
+	Content      string `json:"content"`
+	CreatedAt    string `json:"createdAt"`
+	UpdatedAt    string `json:"updatedAt"`
+	ChannelID    string `json:"channelId"`
+	ForumTopicID int    `json:"forumTopicId"`
+	CreatedBy    string `json:"createdBy"`
+	Mentions     `json:"mentions"`
+}
+
 type ForumTopicObject struct {
 	Title   string `json:"title"`
 	Content string `json:"content"`

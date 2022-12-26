@@ -116,6 +116,16 @@ func init() {
 	interfaces["DocCreated"] = &DocCreated{}
 	interfaces["DocUpdated"] = &DocUpdated{}
 	interfaces["DocDeleted"] = &DocDeleted{}
+	interfaces["CalendarEventCreated"] = &CalendarEventCreated{}
+	interfaces["CalendarEventUpdated"] = &CalendarEventUpdated{}
+	interfaces["CalendarEventDeleted"] = &CalendarEventDeleted{}
+	interfaces["ForumTopicCreated"] = &ForumTopicCreated{}
+	interfaces["ForumTopicUpdated"] = &ForumTopicUpdated{}
+	interfaces["ForumTopicDeleted"] = &ForumTopicDeleted{}
+	interfaces["ForumTopicPinned"] = &ForumTopicPinned{}
+	interfaces["ForumTopicUnpinned"] = &ForumTopicUnpinned{}
+	interfaces["ForumTopicReactionCreated"] = &ForumTopicReactionCreated{}
+	interfaces["ForumTopicReactionDeleted"] = &ForumTopicReactionDeleted{}
 }
 
 type RawEvent struct {

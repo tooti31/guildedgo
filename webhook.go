@@ -156,3 +156,88 @@ type DocDeleted struct {
 	ServerID string `json:"serverId"`
 	Doc      `json:"doc"`
 }
+
+type CalendarEventCreated struct {
+	ServerID      string `json:"serverId"`
+	CalendarEvent `json:"calendarEvent"`
+}
+
+type CalendarEventUpdated struct {
+	ServerID      string `json:"serverId"`
+	CalendarEvent `json:"calendarEvent"`
+}
+
+type CalendarEventDeleted struct {
+	ServerID      string `json:"serverId"`
+	CalendarEvent `json:"calendarEvent"`
+}
+
+type ForumTopicCreated struct {
+	ServerID   string `json:"serverId"`
+	ForumTopic `json:"forumTopic"`
+}
+
+type ForumTopicUpdated struct {
+	ServerID   string `json:"serverId"`
+	ForumTopic `json:"forumTopic"`
+}
+
+type ForumTopicDeleted struct {
+	ServerID   string `json:"serverId"`
+	ForumTopic `json:"forumTopic"`
+}
+
+type ForumTopicPinned struct {
+	ServerID   string `json:"serverId"`
+	ForumTopic `json:"forumTopic"`
+}
+
+type ForumTopicUnpinned struct {
+	ServerID   string `json:"serverId"`
+	ForumTopic `json:"forumTopic"`
+}
+
+type ForumTopicReactionCreated struct {
+	ServerID string `json:"serverId"`
+	Reaction struct {
+		ChannelID    string `json:"channelId"`
+		CreatedBy    string `json:"createdBy"`
+		Emote        `json:"emote"`
+		ForumTopicID int `json:"forumTopicId"`
+	}
+}
+
+type ForumTopicReactionDeleted struct {
+	ServerID string `json:"serverId"`
+	Reaction struct {
+		ChannelID    string `json:"channelId"`
+		CreatedBy    string `json:"createdBy"`
+		Emote        `json:"emote"`
+		ForumTopicID int `json:"forumTopicId"`
+	}
+}
+
+type ForumTopicLocked struct {
+	ServerID   string `json:"serverId"`
+	ForumTopic `json:"forumTopic"`
+}
+
+type ForumTopicUnlocked struct {
+	ServerID   string `json:"serverId"`
+	ForumTopic `json:"forumTopic"`
+}
+
+type ForumTopicCommentCreated struct {
+	ServerID          string `json:"serverId"`
+	ForumTopicComment `json:"forumTopicComment"`
+}
+
+type ForumTopicCommentUpdated struct {
+	ServerID          string `json:"serverId"`
+	ForumTopicComment `json:"forumTopicComment"`
+}
+
+type ForumTopicCommentDeleted struct {
+	ServerID          string `json:"serverId"`
+	ForumTopicComment `json:"forumTopicComment"`
+}
