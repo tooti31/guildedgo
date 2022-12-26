@@ -106,9 +106,16 @@ func init() {
 	interfaces["ServerMemberRemoved"] = &ServerMemberRemoved{}
 	interfaces["ServerMemberBanned"] = &ServerMemberBanned{}
 	interfaces["ServerMemberUnbanned"] = &ServerMemberUnbanned{}
-
+	interfaces["ServerMemberUpdated"] = &ServerMemberUpdated{}
+	interfaces["ServerRolesUpdated"] = &ServerRolesUpdated{}
 	interfaces["ServerChannelCreated"] = &ServerChannelCreated{}
 	interfaces["ServerChannelUpdated"] = &ServerChannelUpdated{}
+	interfaces["ServerChannelDeleted"] = &ServerChannelDeleted{}
+	interfaces["ServerWebhookCreated"] = &ServerWebhookCreated{}
+	interfaces["ServerWebhookUpdated"] = &ServerWebhookUpdated{}
+	interfaces["DocCreated"] = &DocCreated{}
+	interfaces["DocUpdated"] = &DocUpdated{}
+	interfaces["DocDeleted"] = &DocDeleted{}
 }
 
 type RawEvent struct {

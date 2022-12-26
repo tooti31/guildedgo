@@ -107,6 +107,16 @@ type ServerMemberUpdated struct {
 	} `json:"userInfo"`
 }
 
+type ServerRolesUpdated struct {
+	// The ID of the server
+	ServerID string `json:"serverId"`
+
+	MemberRoleIds struct {
+		UserID  string `json:"userId"`
+		RoleIDs []int  `json:"roleIds"`
+	} `json:"memberRoleIds"`
+}
+
 type ServerChannelCreated struct {
 	ServerID string        `json:"serverId"`
 	Channel  ServerChannel `json:"channel"`
@@ -115,4 +125,34 @@ type ServerChannelCreated struct {
 type ServerChannelUpdated struct {
 	ServerID string        `json:"serverId"`
 	Channel  ServerChannel `json:"channel"`
+}
+
+type ServerChannelDeleted struct {
+	ServerID string        `json:"serverId"`
+	Channel  ServerChannel `json:"channel"`
+}
+
+type ServerWebhookCreated struct {
+	ServerID string `json:"serverId"`
+	Webhook  `json:"webhook"`
+}
+
+type ServerWebhookUpdated struct {
+	ServerID string `json:"serverId"`
+	Webhook  `json:"webhook"`
+}
+
+type DocCreated struct {
+	ServerID string `json:"serverId"`
+	Doc      `json:"doc"`
+}
+
+type DocUpdated struct {
+	ServerID string `json:"serverId"`
+	Doc      `json:"doc"`
+}
+
+type DocDeleted struct {
+	ServerID string `json:"serverId"`
+	Doc      `json:"doc"`
 }
