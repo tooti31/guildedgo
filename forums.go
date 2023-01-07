@@ -136,3 +136,34 @@ func (f *forumService) GetForumTopics(channelId string) (*[]ForumTopicSummary, e
 
 	return &forumTopicSummary, nil
 }
+
+func (f *forumService) GetForumTopic(channelId string, forumTopicId int) (*ForumTopic, error) {
+	endpoint := endpoints.GetForumTopicEndpoint(channelId, forumTopicId)
+
+	var forumTopic ForumTopic
+
+	err := f.client.GetRequestV2(endpoint, &forumTopic)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("Failed to get forum topic. Error: \n%v", err.Error()))
+	}
+
+	return &forumTopic, nil
+}
+
+func (f *forumService) UpdateForumTopic(channelId string, forumTopicId int) {
+}
+
+func (f *forumService) DeleteForumTopic() {
+}
+
+func (f *forumService) PinForumTopic() {
+}
+
+func (f *forumService) UnpinForumTopic() {
+}
+
+func (f *forumService) LockForumTopic() {
+}
+
+func (f *forumService) UnlockForumTopic() {
+}
