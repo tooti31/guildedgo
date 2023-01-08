@@ -43,7 +43,7 @@ func main() {
 - [x] Messaging
 - [x] Members
 - [x] Member bans
-- [ ] Forums
+- [x] Forums
 - [ ] Forum comments
 - [ ] List items
 - [ ] Docs
