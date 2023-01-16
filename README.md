@@ -11,33 +11,43 @@ go get github.com/itschip/guildedgo
 ### Example
 
 ```go
+package main
+
+import (
+        "fmt"
+
+        "github.com/itschip/guildedgo"
+)
+
 func main() {
-    serverID := GetEnv("SERVER_ID")
-	token := GetEnv("TOKEN")
+        guildedClient := guildedgo.NewClient(&guildedgo.Config{
+                Token:    "YOUR_TOKEN",
+                ServerID: "YOUR_SERVER_ID",
+        })
 
-	config := &Config{
-		ServerID: serverID,
-		Token:    token,
-	}
+        // Listen to the ChatMessageCreated event
+        guildedClient.On("ChatMessageCreated", func(client *guildedgo.Client, v any) {
+                data, ok := v.(*guildedgo.ChatMessageCreated)
 
-	c := NewClient(config)
+                if ok {
+                        fmt.Println(data.Message.Content)
 
-	c.on("ChatMessageCreated", func(client *Client, e any) {
-		data, ok := e.(*ChatMessageCreated)
-		if ok {
-			if data.Message.Content == "!ping" {
-				client.Channel.SendMessage(data.Message.ChannelID, &MessageObject{
-					Content: "Pong!",
-				})
-			}
-		}
-	})
+                        if data.Message.Content == "!ping" {
+                                guildedClient.Channel.SendMessage(data.Message.ChannelID, &guildedgo.MessageObject{
+                                        Content: "pong!",
+                                })
+                        }
 
-	c.Open()
+                }
+        })
+
+        // Open socket
+        guildedClient.Open()
 }
 ```
 
 ## TODO
+
 - [x] Channels
 - [x] Servers
 - [x] Messaging
@@ -55,3 +65,7 @@ func main() {
 - [ ] Role membership
 - [ ] Webhooks
 - [ ] Emote
+
+```
+
+```
