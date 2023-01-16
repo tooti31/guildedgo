@@ -1,7 +1,6 @@
 package guildedgo
 
 import (
-	"fmt"
 	"log"
 	"testing"
 
@@ -19,15 +18,10 @@ func TestNewClient(t *testing.T) {
 
 	c := NewClient(config)
 
-	c.Command("!updatenick", func(client *Client, v *ChatMessageCreated) {
-		fmt.Println("Created by: ", v.Message.CreatedBy)
-		nick, err := client.Members.UpdateMemberNickname(v.Message.CreatedBy, "coolnick")
-		if err != nil {
-			log.Println(err.Error())
-		}
-
-		fmt.Println("new nick: ", nick)
-	})
+	err := c.Forums.LockForumTopic("", 0)
+	if err != nil {
+		log.Println(err)
+	}
 
 	c.Open()
 }

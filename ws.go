@@ -126,6 +126,14 @@ func init() {
 	interfaces["ForumTopicUnpinned"] = &ForumTopicUnpinned{}
 	interfaces["ForumTopicReactionCreated"] = &ForumTopicReactionCreated{}
 	interfaces["ForumTopicReactionDeleted"] = &ForumTopicReactionDeleted{}
+	interfaces["ForumTopicLocked"] = &ForumTopic{}
+	interfaces["ForumTopicUnlocked"] = &ForumTopic{}
+	interfaces["ForumTopicCommentCreated"] = &ForumTopicComment{}
+	interfaces["ForumTopicCommentUpdated"] = &ForumTopicComment{}
+	interfaces["ForumTopicCommentDeleted"] = &ForumTopicComment{}
+	interfaces["CalendarEventRsvpUpdated"] = &CalendarEventRsvp{}
+	interfaces["CalendarEventRsvpManyUpdated"] = &[]CalendarEventRsvp{}
+	interfaces["CalendarEventRsvpDeleted"] = &CalendarEventRsvp{}
 }
 
 type RawEvent struct {

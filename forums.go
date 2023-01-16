@@ -3,13 +3,14 @@ package guildedgo
 import (
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/itschip/guildedgo/endpoints"
 )
 
 type ForumTopic struct {
 	// The ID of the forum topic
-	ID string `json:"id"`
+	ID int `json:"id"`
 
 	// The ID of the server
 	ServerID string `json:"serverId"`
@@ -109,7 +110,17 @@ type UpdateTopicObject struct {
 	Content string `json:"content,omitempty"`
 }
 
-type ForumService interface{}
+type ForumService interface {
+	CreateForumTopic(channelId string, forumTopicObject *ForumTopicObject) (*ForumTopic, error)
+	GetForumTopics(channelId string) (*[]ForumTopicSummary, error)
+	GetForumTopic(channelId string, forumTopicId int) (*ForumTopic, error)
+	UpdateForumTopic(channelId string, forumTopicId int, updateTopicObject *UpdateTopicObject) (*ForumTopic, error)
+	DeleteForumTopic(channelId string, forumTopicId int) error
+	PinForumTopic(channelId string, forumTopicId int) error
+	UnpinForumTopic(channelId string, forumTopicId int) error
+	LockForumTopic(channelId string, forumTopicId int) error
+	UnlockForumTopic(channelId string, forumTopicId int) error
+}
 
 type forumService struct {
 	client *Client
@@ -214,6 +225,8 @@ func (f *forumService) LockForumTopic(channelId string, forumTopicId int) error 
 
 func (f *forumService) UnlockForumTopic(channelId string, forumTopicId int) error {
 	endpoint := endpoints.PinForumTopicEndpoint(channelId, forumTopicId)
+
+	log.Println(endpoint)
 
 	_, err := f.client.DeleteRequest(endpoint)
 	if err != nil {

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -76,6 +77,9 @@ func (c *Client) GetRequestV2(endpoint string, v any) error {
 
 func (c *Client) PutRequest(endpoint string, body interface{}) ([]byte, error) {
 	jsonBody, _ := json.Marshal(&body)
+
+	// TODO: Remove
+	fmt.Println(string(jsonBody))
 
 	resp, err := DoRequest("PUT", endpoint, jsonBody, c.Token)
 	if err != nil {

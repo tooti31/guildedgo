@@ -21,3 +21,15 @@ type CalendarEvent struct {
 		CreatedBy   string `json:"createdBy,omitempty"`
 	} `json:"cancellation,omitempty"`
 }
+
+type CalendarEventRsvp struct {
+	CalendarEventID int    `json:"calendarEventId"`
+	ChannelID       string `json:"channelId"`
+	ServerID        string `json:"serverId"`
+	UserID          string `json:"userId"`
+	Status          string `json:"status"`
+	CreatedBy       string `json:"createdAt"`
+	CreatedAt       string `json:"createdAt"`
+	UpdatedBy       string `json:"updatedAt"`
+	UpdatedAt       string `json:"updatedAt"`
+}
