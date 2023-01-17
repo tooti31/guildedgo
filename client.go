@@ -2,6 +2,10 @@ package guildedgo
 
 import "net/http"
 
+const (
+	guildedApi = "https://www.guilded.gg/api/v1"
+)
+
 type Client struct {
 	Token    string
 	ServerID string

@@ -1,7 +1,6 @@
 package guildedgo
 
 import (
-	"log"
 	"testing"
 
 	"github.com/itschip/guildedgo/internal"
@@ -18,10 +17,10 @@ func TestNewClient(t *testing.T) {
 
 	c := NewClient(config)
 
-	err := c.Forums.LockForumTopic("", 0)
-	if err != nil {
-		log.Println(err)
-	}
+	c.Forums.CreateForumTopic("", &ForumTopicObject{
+		Title:   "what the fuck",
+		Content: "HUH??",
+	})
 
 	c.Open()
 }

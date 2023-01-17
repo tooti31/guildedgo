@@ -110,6 +110,29 @@ type UpdateTopicObject struct {
 	Content string `json:"content,omitempty"`
 }
 
+type forumEndpoints struct{}
+
+func (e *forumEndpoints) Default(channelId string) string {
+	return guildedApi + "/channels/" + channelId + "/topics"
+}
+
+func (e *forumEndpoints) Get(channelId string, forumTopicId int) string {
+	return guildedApi + "/channels/" + channelId + "/topics/" + fmt.Sprint(forumTopicId)
+}
+
+func (e *forumEndpoints) Pin(channelId string, forumTopicId int) string {
+	return guildedApi + "/channels/" + channelId + "/topics/" + fmt.Sprint(forumTopicId) + "/pin"
+}
+
+func (e *forumEndpoints) Lock(channelId string, forumTopicId int) string {
+	return guildedApi + "/channels/" + channelId + "/topics/" + fmt.Sprint(forumTopicId) + "/lock"
+}
+
+type forumService struct {
+	client    *Client
+	endpoints *forumEndpoints
+}
+
 type ForumService interface {
 	CreateForumTopic(channelId string, forumTopicObject *ForumTopicObject) (*ForumTopic, error)
 	GetForumTopics(channelId string) (*[]ForumTopicSummary, error)
@@ -122,17 +145,15 @@ type ForumService interface {
 	UnlockForumTopic(channelId string, forumTopicId int) error
 }
 
-type forumService struct {
-	client *Client
+var _ ForumService = &forumService{
+	endpoints: &forumEndpoints{},
 }
 
-var _ ForumService = &forumService{}
-
-func (f *forumService) CreateForumTopic(channelId string, forumTopicObject *ForumTopicObject) (*ForumTopic, error) {
-	endpoint := endpoints.ForumTopicEndpoint(channelId)
+func (service *forumService) CreateForumTopic(channelId string, forumTopicObject *ForumTopicObject) (*ForumTopic, error) {
+	endpoint := service.endpoints.Default(channelId)
 
 	var forumTopic ForumTopic
-	err := f.client.PostRequestV2(endpoint, &forumTopicObject, &forumTopic)
+	err := service.client.PostRequestV2(endpoint, &forumTopicObject, &forumTopic)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Failed to create new forum topic. Error: \n%v", err.Error()))
 	}
@@ -140,12 +161,12 @@ func (f *forumService) CreateForumTopic(channelId string, forumTopicObject *Foru
 	return &forumTopic, nil
 }
 
-func (f *forumService) GetForumTopics(channelId string) (*[]ForumTopicSummary, error) {
-	endpoint := endpoints.ForumTopicEndpoint(channelId)
+func (service *forumService) GetForumTopics(channelId string) (*[]ForumTopicSummary, error) {
+	endpoint := service.endpoints.Default(channelId)
 
 	var forumTopicSummary []ForumTopicSummary
 
-	err := f.client.GetRequestV2(endpoint, &forumTopicSummary)
+	err := service.client.GetRequestV2(endpoint, &forumTopicSummary)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Failed to get forum topics. Error: \n%v", err.Error()))
 	}
@@ -153,12 +174,12 @@ func (f *forumService) GetForumTopics(channelId string) (*[]ForumTopicSummary, e
 	return &forumTopicSummary, nil
 }
 
-func (f *forumService) GetForumTopic(channelId string, forumTopicId int) (*ForumTopic, error) {
-	endpoint := endpoints.GetForumTopicEndpoint(channelId, forumTopicId)
+func (service *forumService) GetForumTopic(channelId string, forumTopicId int) (*ForumTopic, error) {
+	endpoint := service.endpoints.Get(channelId, forumTopicId)
 
 	var forumTopic ForumTopic
 
-	err := f.client.GetRequestV2(endpoint, &forumTopic)
+	err := service.client.GetRequestV2(endpoint, &forumTopic)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Failed to get forum topic. Error: \n%v", err.Error()))
 	}
@@ -166,12 +187,12 @@ func (f *forumService) GetForumTopic(channelId string, forumTopicId int) (*Forum
 	return &forumTopic, nil
 }
 
-func (f *forumService) UpdateForumTopic(channelId string, forumTopicId int, topicObject *UpdateTopicObject) (*ForumTopic, error) {
-	endpoint := endpoints.GetForumTopicEndpoint(channelId, forumTopicId)
+func (service *forumService) UpdateForumTopic(channelId string, forumTopicId int, topicObject *UpdateTopicObject) (*ForumTopic, error) {
+	endpoint := service.endpoints.Get(channelId, forumTopicId)
 
 	var forumTopic ForumTopic
 
-	err := f.client.PatchRequest(endpoint, &topicObject, &forumTopic)
+	err := service.client.PatchRequest(endpoint, &topicObject, &forumTopic)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Failed to update forum topic. Error: \n%v", err.Error()))
 	}
@@ -179,10 +200,10 @@ func (f *forumService) UpdateForumTopic(channelId string, forumTopicId int, topi
 	return &forumTopic, nil
 }
 
-func (f *forumService) DeleteForumTopic(channelId string, forumTopicId int) error {
-	endpoint := endpoints.GetForumTopicEndpoint(channelId, forumTopicId)
+func (service *forumService) DeleteForumTopic(channelId string, forumTopicId int) error {
+	endpoint := service.endpoints.Get(channelId, forumTopicId)
 
-	_, err := f.client.DeleteRequest(endpoint)
+	_, err := service.client.DeleteRequest(endpoint)
 	if err != nil {
 		return errors.New(fmt.Sprintf("Failed to delete forum topic. Error: \n%v", err.Error()))
 	}
@@ -190,10 +211,10 @@ func (f *forumService) DeleteForumTopic(channelId string, forumTopicId int) erro
 	return nil
 }
 
-func (f *forumService) PinForumTopic(channelId string, forumTopicId int) error {
-	endpoint := endpoints.PinForumTopicEndpoint(channelId, forumTopicId)
+func (service *forumService) PinForumTopic(channelId string, forumTopicId int) error {
+	endpoint := service.endpoints.Pin(channelId, forumTopicId)
 
-	_, err := f.client.PutRequest(endpoint, nil)
+	_, err := service.client.PutRequest(endpoint, nil)
 	if err != nil {
 		return errors.New(fmt.Sprintf("Failed to pin forum topic. Error: \n%v", err.Error()))
 	}
@@ -201,10 +222,10 @@ func (f *forumService) PinForumTopic(channelId string, forumTopicId int) error {
 	return nil
 }
 
-func (f *forumService) UnpinForumTopic(channelId string, forumTopicId int) error {
-	endpoint := endpoints.PinForumTopicEndpoint(channelId, forumTopicId)
+func (service *forumService) UnpinForumTopic(channelId string, forumTopicId int) error {
+	endpoint := service.endpoints.Pin(channelId, forumTopicId)
 
-	_, err := f.client.DeleteRequest(endpoint)
+	_, err := service.client.DeleteRequest(endpoint)
 	if err != nil {
 		return errors.New(fmt.Sprintf("Failed to unpin forum topic. Error: \n%v", err.Error()))
 	}
@@ -212,10 +233,10 @@ func (f *forumService) UnpinForumTopic(channelId string, forumTopicId int) error
 	return nil
 }
 
-func (f *forumService) LockForumTopic(channelId string, forumTopicId int) error {
-	endpoint := endpoints.LockForumTopicEndpoint(channelId, forumTopicId)
+func (service *forumService) LockForumTopic(channelId string, forumTopicId int) error {
+	endpoint := service.endpoints.Lock(channelId, forumTopicId)
 
-	_, err := f.client.PutRequest(endpoint, nil)
+	_, err := service.client.PutRequest(endpoint, nil)
 	if err != nil {
 		return errors.New(fmt.Sprintf("Failed to lock forum topic. Error: \n%v", err.Error()))
 	}
@@ -223,15 +244,16 @@ func (f *forumService) LockForumTopic(channelId string, forumTopicId int) error 
 	return nil
 }
 
-func (f *forumService) UnlockForumTopic(channelId string, forumTopicId int) error {
-	endpoint := endpoints.PinForumTopicEndpoint(channelId, forumTopicId)
+func (service *forumService) UnlockForumTopic(channelId string, forumTopicId int) error {
+	endpoint := service.endpoints.Lock(channelId, forumTopicId)
 
-	log.Println(endpoint)
-
-	_, err := f.client.DeleteRequest(endpoint)
+	_, err := service.client.DeleteRequest(endpoint)
 	if err != nil {
 		return errors.New(fmt.Sprintf("Failed to unlock forum topic. Error: \n%v", err.Error()))
 	}
 
 	return nil
+}
+
+func (service *forumService) CreateTopicComment() {
 }
