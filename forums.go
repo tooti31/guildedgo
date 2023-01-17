@@ -3,9 +3,6 @@ package guildedgo
 import (
 	"errors"
 	"fmt"
-	"log"
-
-	"github.com/itschip/guildedgo/endpoints"
 )
 
 type ForumTopic struct {
@@ -100,6 +97,10 @@ type ForumTopicComment struct {
 	Mentions     `json:"mentions"`
 }
 
+type ForumCommentObject struct {
+	Content string `json:"content"`
+}
+
 type ForumTopicObject struct {
 	Title   string `json:"title"`
 	Content string `json:"content"`
@@ -128,6 +129,10 @@ func (e *forumEndpoints) Lock(channelId string, forumTopicId int) string {
 	return guildedApi + "/channels/" + channelId + "/topics/" + fmt.Sprint(forumTopicId) + "/lock"
 }
 
+func (e *forumEndpoints) Comments(channelId string, forumTopicId int) string {
+	return guildedApi + "/channels/" + channelId + "/topics/" + fmt.Sprint(forumTopicId) + "/comments"
+}
+
 type forumService struct {
 	client    *Client
 	endpoints *forumEndpoints
@@ -143,6 +148,7 @@ type ForumService interface {
 	UnpinForumTopic(channelId string, forumTopicId int) error
 	LockForumTopic(channelId string, forumTopicId int) error
 	UnlockForumTopic(channelId string, forumTopicId int) error
+	CreateTopicComment(channelId string, forumTopicId int, forumCommentObject *ForumCommentObject) (*ForumTopicComment, error)
 }
 
 var _ ForumService = &forumService{
@@ -255,5 +261,15 @@ func (service *forumService) UnlockForumTopic(channelId string, forumTopicId int
 	return nil
 }
 
-func (service *forumService) CreateTopicComment() {
+func (service *forumService) CreateTopicComment(channelId string, forumTopicId int, forumCommentObject *ForumCommentObject) (*ForumTopicComment, error) {
+	endpoint := service.endpoints.Comments(channelId, forumTopicId)
+
+	var forumComment ForumTopicComment
+
+	err := service.client.PostRequestV2(endpoint, &forumCommentObject, &forumComment)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("Failed to create new forum topic comment. Error: \n%v", err.Error()))
+	}
+
+	return &forumComment, nil
 }
