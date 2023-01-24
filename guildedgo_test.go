@@ -1,7 +1,6 @@
 package guildedgo
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/itschip/guildedgo/internal"
@@ -18,15 +17,11 @@ func TestNewClient(t *testing.T) {
 
 	c := NewClient(config)
 
-	e, err := c.Calendar.GetEvents("", &GetEventsOptions{
-		Limit: 1,
-	})
+	err := c.Calendar.DeleteEvent("", 0)
 	if err != nil {
 		t.Error(err)
 		return
 	}
-
-	fmt.Println(e)
 
 	c.Open()
 }

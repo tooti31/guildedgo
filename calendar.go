@@ -2,7 +2,6 @@ package guildedgo
 
 import (
 	"errors"
-	"fmt"
 	"net/url"
 	"strconv"
 )
@@ -41,8 +40,8 @@ type CalendarEventRsvp struct {
 	UpdatedAt       string `json:"updatedAt"`
 }
 
-type CreateCalenderEventObject struct {
-	Name        string `json:"name"`
+type CalenderEventObject struct {
+	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
 	Location    string `json:"location,omitempty"`
 	StartsAt    string `json:"startsAt,omitempty"`
@@ -61,6 +60,14 @@ type CalendarEventsResponse struct {
 	Events []CalendarEvent `json:"calendarEvents"`
 }
 
+type CalendarEventRsvpResponse struct {
+	Rsvp CalendarEventRsvp `json:"calendarEventRsvp"`
+}
+
+type CalendarEventRsvpsResponse struct {
+	Rsvps []CalendarEventRsvp `json:"calendarEventRsvps"`
+}
+
 type calenderEndpoints struct{}
 
 func (e *calenderEndpoints) Default(channelId string) string {
@@ -71,22 +78,36 @@ func (e *calenderEndpoints) Get(channelId string, eventId int) string {
 	return guildedApi + "/channels/" + channelId + "/events/" + strconv.Itoa(eventId)
 }
 
+func (e *calenderEndpoints) RsvpDefault(channelId string, eventId int, userId string) string {
+	return guildedApi + "/channels/" + channelId + "/events/" + strconv.Itoa(eventId) + "/rsvps/" + userId
+}
+
+func (e *calenderEndpoints) Rsvps(channelId string, eventId int) string {
+	return guildedApi + "/channels/" + channelId + "/events/" + strconv.Itoa(eventId) + "/rsvps"
+}
+
 type calendarService struct {
 	client    *Client
 	endpoints *calenderEndpoints
 }
 
 type CalendarService interface {
-	CreateEvent(channelId string, event *CreateCalenderEventObject) (*CalendarEvent, error)
+	CreateEvent(channelId string, event *CalenderEventObject) (*CalendarEvent, error)
 	GetEvents(channelId string, options *GetEventsOptions) ([]CalendarEvent, error)
 	GetEvent(channelId string, eventId int) (*CalendarEvent, error)
+	UpdateEvent(channelId string, eventId int, event *CalenderEventObject) (*CalendarEvent, error)
+	DeleteEvent(channelId string, eventId int) error
+	GetEventRSVP(channelId string, eventId int, userId string) (*CalendarEventRsvp, error)
+	CreateOrUpdateEventRSVP(channelId string, eventId int, userId string) (*CalendarEventRsvp, error)
+	DeleteEventRSVP(channelId string, eventId int, userId string) error
+	GetEventRSVPs(channelId string, eventId int) ([]CalendarEventRsvp, error)
 }
 
 var _ CalendarService = &calendarService{
 	endpoints: &calenderEndpoints{},
 }
 
-func (service *calendarService) CreateEvent(channelId string, event *CreateCalenderEventObject) (*CalendarEvent, error) {
+func (service *calendarService) CreateEvent(channelId string, event *CalenderEventObject) (*CalendarEvent, error) {
 	var calendarEvent CalendarEventResponse
 
 	err := service.client.PostRequestV2(service.endpoints.Default(channelId), event, &calendarEvent)
@@ -141,4 +162,66 @@ func (service *calendarService) GetEvent(channelId string, eventId int) (*Calend
 	}
 
 	return &calendarEvent.Event, nil
+}
+
+func (service *calendarService) UpdateEvent(channelId string, eventId int, event *CalenderEventObject) (*CalendarEvent, error) {
+	var calendarEvent CalendarEventResponse
+
+	err := service.client.PatchRequest(service.endpoints.Get(channelId, eventId), event, &calendarEvent)
+	if err != nil {
+		return nil, errors.New("Failed to update calendar event: " + err.Error())
+	}
+
+	return &calendarEvent.Event, nil
+}
+
+func (service *calendarService) DeleteEvent(channelId string, eventId int) error {
+	_, err := service.client.DeleteRequest(service.endpoints.Get(channelId, eventId))
+	if err != nil {
+		return errors.New("Failed to delete calendar event: " + err.Error())
+	}
+
+	return nil
+}
+
+func (service *calendarService) GetEventRSVP(channelId string, eventId int, userId string) (*CalendarEventRsvp, error) {
+	var calendarEventRsvp CalendarEventRsvpResponse
+
+	err := service.client.GetRequestV2(service.endpoints.RsvpDefault(channelId, eventId, userId), &calendarEventRsvp)
+	if err != nil {
+		return nil, errors.New("Failed to get calendar event rsvp: " + err.Error())
+	}
+
+	return &calendarEventRsvp.Rsvp, nil
+}
+
+func (service *calendarService) CreateOrUpdateEventRSVP(channelId string, eventId int, userId string) (*CalendarEventRsvp, error) {
+	var calendarEventRsvp CalendarEventRsvpResponse
+
+	err := service.client.GetRequestV2(service.endpoints.RsvpDefault(channelId, eventId, userId), &calendarEventRsvp)
+	if err != nil {
+		return nil, errors.New("Failed to create or update calendar event RSVP. Error: " + err.Error())
+	}
+
+	return &calendarEventRsvp.Rsvp, nil
+}
+
+func (service *calendarService) DeleteEventRSVP(channelId string, eventId int, userId string) error {
+	_, err := service.client.DeleteRequest(service.endpoints.RsvpDefault(channelId, eventId, userId))
+	if err != nil {
+		return errors.New("Failed to delete calendar event RSVP. Error: " + err.Error())
+	}
+
+	return nil
+}
+
+func (service *calendarService) GetEventRSVPs(channelId string, eventId int) ([]CalendarEventRsvp, error) {
+	var calendarEventRsvps CalendarEventRsvpsResponse
+
+	err := service.client.GetRequestV2(service.endpoints.Rsvps(channelId, eventId), &calendarEventRsvps)
+	if err != nil {
+		return nil, errors.New("Failed to get calendar event RSVPs. Error: " + err.Error())
+	}
+
+	return calendarEventRsvps.Rsvps, nil
 }
