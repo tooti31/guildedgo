@@ -54,10 +54,10 @@ func main() {
 - [x] Members
 - [x] Member bans
 - [x] Forums
-- [ ] Forum comments
-- [ ] List items
-- [ ] Docs
-- [ ] Calendar events
+- [x] Forum comments
+- [x] List items
+- [x] Docs
+- [x] Calendar events
 - [ ] Reactions
 - [ ] Server XP
 - [ ] Social links
