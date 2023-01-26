@@ -78,15 +78,28 @@ func (c *Client) GetRequestV2(endpoint string, v any) error {
 func (c *Client) PutRequest(endpoint string, body interface{}) ([]byte, error) {
 	jsonBody, _ := json.Marshal(&body)
 
-	// TODO: Remove
-	fmt.Println(string(jsonBody))
-
 	resp, err := DoRequest("PUT", endpoint, jsonBody, c.Token)
 	if err != nil {
 		return nil, err
 	}
 
 	return resp, nil
+}
+
+func (c *Client) PutRequestV2(endpoint string, body interface{}, v any) error {
+	jsonBody, _ := json.Marshal(&body)
+
+	resp, err := DoRequest("PUT", endpoint, jsonBody, c.Token)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(resp, &v)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (c *Client) DeleteRequest(endpoint string) ([]byte, error) {
