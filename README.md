@@ -58,7 +58,7 @@ func main() {
 - [x] List items
 - [x] Docs
 - [x] Calendar events
-- [ ] Reactions
+- [x] Reactions
 - [ ] Server XP
 - [ ] Social links
 - [ ] Group membership
