@@ -18,6 +18,7 @@ type Client struct {
 	Forums    ForumService
 	Calendar  CalendarService
 	Reactions ReactionService
+	List      ListService
 	Events    map[string]Event
 }
 
@@ -45,6 +46,7 @@ func NewClient(config *Config) *Client {
 	c.Forums = &forumService{client: c}
 	c.Calendar = &calendarService{client: c}
 	c.Reactions = &reactionService{client: c}
+	c.List = &listService{client: c}
 
 	c.Events = make(map[string]Event)
 
