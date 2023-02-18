@@ -20,6 +20,7 @@ type Client struct {
 	Reactions ReactionService
 	List      ListService
 	Webhooks  WebhookService
+	ServerXP  ServerXPService
 	Events    map[string]Event
 }
 
@@ -49,6 +50,7 @@ func NewClient(config *Config) *Client {
 	c.Reactions = &reactionService{client: c}
 	c.List = &listService{client: c}
 	c.Webhooks = &webhookService{client: c}
+	c.ServerXP = &serverXPService{client: c}
 
 	c.Events = make(map[string]Event)
 
