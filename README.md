@@ -59,11 +59,12 @@ func main() {
 - [x] Docs
 - [x] Calendar events
 - [x] Reactions
-- [ ] Server XP
+- [x] Server XP
 - [ ] Social links
 - [ ] Group membership
 - [ ] Role membership
-- [ ] Webhooks
+- [x] Webhooks
+- [ ] Doc comments
 - [ ] Emote
 
 ```
