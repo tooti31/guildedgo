@@ -22,7 +22,11 @@ type Client struct {
 	Webhooks       WebhookService
 	ServerXP       ServerXPService
 	CommandService CommandService
-	Events         map[string]Event
+
+	// DEPRECATED
+	Events   map[string]Event
+	events   map[string][]Event
+	commands map[string]Command
 }
 
 type Event struct {
@@ -55,6 +59,7 @@ func NewClient(config *Config) *Client {
 	c.ServerXP = &serverXPService{client: c}
 
 	c.Events = make(map[string]Event)
+	c.events = make(map[string][]Event)
 
 	return c
 }

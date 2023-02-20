@@ -25,6 +25,7 @@ func (service *commandService) AddCommand(command *Command) {
 }
 
 func (service *commandService) AddCommands(builder *CommandsBuilder) {
+	// Is this the best way to do this? I'm not sure. - Thanks, Copilot
 	for _, command := range builder.Commands {
 		service.client.Command(command.CommandName, command.Action)
 	}

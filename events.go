@@ -5,9 +5,10 @@ import "fmt"
 // On listens to any event
 func (c *Client) On(event string, callback func(client *Client, v any)) {
 	fmt.Println("On called", event)
-	c.Events[event] = Event{
+
+	c.events[event] = append(c.events[event], Event{
 		Callback: callback,
-	}
+	})
 }
 
 // Command listens to ChatMessageCreated and fires a func when the message content matches the command

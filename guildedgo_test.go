@@ -18,10 +18,6 @@ func TestNewClient(t *testing.T) {
 
 	c := NewClient(config)
 
-	c.Command("!wtf", func(client *Client, v *ChatMessageCreated) {
-		fmt.Println("wtf indeed")
-	})
-
 	commands := &CommandsBuilder{
 		Commands: []Command{
 			{

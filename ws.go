@@ -157,8 +157,9 @@ func (c *Client) onEvent(msg []byte) {
 		log.Printf("Failed to unmarshal event data for %q. Error: %s", re.T, err.Error())
 	}
 
-	eventCB := c.Events[re.T]
-	if eventCB.Callback != nil {
-		eventCB.Callback(c, eventType)
+	// Is this smart? Probably not.
+	eventsCB := c.events[re.T]
+	for _, callback := range eventsCB {
+		callback.Callback(c, eventType)
 	}
 }
