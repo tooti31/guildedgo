@@ -2,8 +2,6 @@ package guildedgo
 
 import (
 	"errors"
-
-	"github.com/itschip/guildedgo/endpoints"
 )
 
 type ListItem struct {

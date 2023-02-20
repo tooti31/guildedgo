@@ -43,7 +43,6 @@ func (c *Client) Open() {
 	}
 
 	m = bytes.TrimSpace(bytes.Replace(m, newline, space, -1))
-	//	fmt.Println(string(m))
 
 	listening := make(chan struct{})
 
@@ -72,7 +71,6 @@ func (c *Client) Open() {
 		case t := <-ticker.C:
 			err := conn.WriteMessage(websocket.TextMessage, []byte(t.String()))
 			if err != nil {
-				log.Println("write", err)
 				return
 			}
 		case <-interrupt:
@@ -80,7 +78,6 @@ func (c *Client) Open() {
 
 			err := conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 			if err != nil {
-				log.Println("write close", err)
 				return
 			}
 

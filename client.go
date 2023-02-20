@@ -11,17 +11,18 @@ type Client struct {
 	ServerID string
 	client   *http.Client
 
-	Channel   ChannelService
-	Members   MembersService
-	Roles     RoleService
-	Server    ServerService
-	Forums    ForumService
-	Calendar  CalendarService
-	Reactions ReactionService
-	List      ListService
-	Webhooks  WebhookService
-	ServerXP  ServerXPService
-	Events    map[string]Event
+	Channel        ChannelService
+	Members        MembersService
+	Roles          RoleService
+	Server         ServerService
+	Forums         ForumService
+	Calendar       CalendarService
+	Reactions      ReactionService
+	List           ListService
+	Webhooks       WebhookService
+	ServerXP       ServerXPService
+	CommandService CommandService
+	Events         map[string]Event
 }
 
 type Event struct {
@@ -48,6 +49,7 @@ func NewClient(config *Config) *Client {
 	c.Forums = &forumService{client: c}
 	c.Calendar = &calendarService{client: c}
 	c.Reactions = &reactionService{client: c}
+	c.CommandService = &commandService{client: c}
 	c.List = &listService{client: c}
 	c.Webhooks = &webhookService{client: c}
 	c.ServerXP = &serverXPService{client: c}

@@ -1,6 +1,7 @@
 package guildedgo
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/itschip/guildedgo/internal"
@@ -17,11 +18,36 @@ func TestNewClient(t *testing.T) {
 
 	c := NewClient(config)
 
-	err := c.Calendar.DeleteEvent("", 0)
-	if err != nil {
-		t.Error(err)
-		return
+	c.Command("!wtf", func(client *Client, v *ChatMessageCreated) {
+		fmt.Println("wtf indeed")
+	})
+
+	commands := &CommandsBuilder{
+		Commands: []Command{
+			{
+				CommandName: "!test",
+				Action: func(client *Client, v *ChatMessageCreated) {
+					client.Channel.SendMessage(v.Message.ChannelID, &MessageObject{
+						Content: "Test",
+					})
+
+					fmt.Println("Test working")
+				},
+			},
+			{
+				CommandName: "!party",
+				Action: func(client *Client, v *ChatMessageCreated) {
+					client.Channel.SendMessage(v.Message.ChannelID, &MessageObject{
+						Content: "Yeah!!! Let's party",
+					})
+
+					fmt.Println("Party working")
+				},
+			},
+		},
 	}
+
+	c.CommandService.AddCommands(commands)
 
 	c.Open()
 }
