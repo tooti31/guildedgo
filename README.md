@@ -8,7 +8,30 @@ A guilded.gg library in Go
 go get github.com/itschip/guildedgo
 ```
 
-### Example
+## TODO
+
+- [x] Channels
+- [x] Servers
+- [x] Messaging
+- [x] Members
+- [x] Member bans
+- [x] Forums
+- [x] Forum comments
+- [x] List items
+- [x] Docs
+- [x] Calendar events
+- [x] Reactions
+- [x] Server XP
+- [ ] Social links
+- [ ] Group membership
+- [ ] Role membership
+- [x] Webhooks
+- [ ] Doc comments
+- [ ] Emote
+
+## Examples
+
+### Listen to events
 
 ```go
 package main
@@ -46,27 +69,45 @@ func main() {
 }
 ```
 
-## TODO
+### Command builder
+```go
+serverID := internal.GetEnv("SERVER_ID")
+	token := internal.GetEnv("TOKEN")
 
-- [x] Channels
-- [x] Servers
-- [x] Messaging
-- [x] Members
-- [x] Member bans
-- [x] Forums
-- [x] Forum comments
-- [x] List items
-- [x] Docs
-- [x] Calendar events
-- [x] Reactions
-- [x] Server XP
-- [ ] Social links
-- [ ] Group membership
-- [ ] Role membership
-- [x] Webhooks
-- [ ] Doc comments
-- [ ] Emote
+	config := &guildedgo.Config{
+		ServerID: serverID,
+		Token:    token,
+	}
 
+	c := guildedgo.NewClient(config)
+
+	commands := &guildedgo.CommandsBuilder{
+		Commands: []Command{
+			{
+				CommandName: "!test",
+				Action: func(client *Client, v *ChatMessageCreated) {
+					client.Channel.SendMessage(v.Message.ChannelID, &MessageObject{
+						Content: "Test",
+					})
+
+					fmt.Println("Test working")
+				},
+			},
+			{
+				CommandName: "!party",
+				Action: func(client *Client, v *ChatMessageCreated) {
+					client.Channel.SendMessage(v.Message.ChannelID, &MessageObject{
+						Content: "Yeah!!! Let's party",
+					})
+
+					fmt.Println("Party working")
+				},
+			},
+		},
+	}
+
+	c.CommandService.AddCommands(commands)
+
+	c.Open()
 ```
 
-```
