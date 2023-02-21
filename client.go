@@ -22,6 +22,8 @@ type Client struct {
 	Webhooks       WebhookService
 	ServerXP       ServerXPService
 	CommandService CommandService
+	DocComments    DocCommentService
+	Docs           DocsService
 
 	// DEPRECATED
 	Events   map[string]Event
@@ -57,6 +59,8 @@ func NewClient(config *Config) *Client {
 	c.List = &listService{client: c}
 	c.Webhooks = &webhookService{client: c}
 	c.ServerXP = &serverXPService{client: c}
+	c.Docs = &docsService{client: c}
+	c.DocComments = &docCommentService{client: c}
 
 	c.Events = make(map[string]Event)
 	c.events = make(map[string][]Event)
