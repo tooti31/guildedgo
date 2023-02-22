@@ -24,6 +24,7 @@ func (e *docCommentEndpoints) Default(channelID string, docID int) string {
 
 type DocCommentService interface {
 	Create(channelID string, docID int, content string) (*DocComment, error)
+	GetComments(channelID string, docID int) ([]DocComment, error)
 }
 
 type docCommentService struct {
@@ -41,4 +42,14 @@ func (s *docCommentService) Create(channelID string, docID int, content string) 
 	}
 
 	return &comment, nil
+}
+
+func (s *docCommentService) GetComments(channelID string, docID int) ([]DocComment, error) {
+	var comments []DocComment
+	err := s.client.GetRequestV2(s.endpoints.Default(channelID, docID), &comments)
+	if err != nil {
+		return nil, errors.New("error getting doc comments: " + err.Error())
+	}
+
+	return comments, nil
 }
