@@ -186,7 +186,6 @@ func (cs *channelService) UpdateChannelMessage(channelId string, messageId strin
 		return nil, err
 	}
 
-	fmt.Println(msg)
 	return &msg.Message, err
 }
 
