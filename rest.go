@@ -143,10 +143,7 @@ func do(req *http.Request) ([]byte, error) {
 	}
 
 	switch resp.StatusCode {
-	case http.StatusBadGateway:
-	case http.StatusForbidden:
-	case http.StatusNotFound:
-	case http.StatusBadRequest:
+	case http.StatusBadGateway, http.StatusForbidden, http.StatusBadRequest, http.StatusNotFound:
 		var resError responseError
 
 		err := json.Unmarshal(body, &resError)

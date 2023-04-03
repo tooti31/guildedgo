@@ -26,8 +26,6 @@ type Client struct {
 	Docs           DocsService
 	Socials        SocialsService
 
-	// DEPRECATED
-	Events   map[string]Event
 	events   map[string][]Event
 	commands map[string]Command
 }
@@ -64,7 +62,6 @@ func NewClient(config *Config) *Client {
 	c.DocComments = &docCommentService{client: c}
 	c.Socials = &socialsService{client: c}
 
-	c.Events = make(map[string]Event)
 	c.events = make(map[string][]Event)
 
 	return c

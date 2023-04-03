@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-
-	"github.com/itschip/guildedgo/endpoints"
 )
 
 type ServerMember struct {
@@ -95,14 +93,33 @@ type MembersService interface {
 	GetServerMembers() (*[]ServerMemberSummary, error)
 }
 
+type membersEndpoints struct{}
+
+func (e *membersEndpoints) Nickname(serverId, userId string) string {
+	return guildedApi + "/servers" + serverId + "/members" + userId + "/nickname"
+}
+
+func (e *membersEndpoints) GetMember(serverId, userId string) string {
+	return guildedApi + "/servers/" + serverId + "/members/" + userId
+}
+
+func (e *membersEndpoints) GetMembers(serverId string) string {
+	return guildedApi + "/servers/" + serverId + "/members"
+}
+
+func (e *membersEndpoints) Ban(serverId, userId string) string {
+	return guildedApi + "/servers/" + serverId + "/bans/" + userId
+}
+
 type membersService struct {
-	client *Client
+	client    *Client
+	endpoints membersEndpoints
 }
 
 var _ MembersService = &membersService{}
 
 func (ms *membersService) UpdateMemberNickname(userId string, nickname string) (*NicknameResponse, error) {
-	endpoint := endpoints.MemberNicknameEndpoint(ms.client.ServerID, userId)
+	endpoint := ms.endpoints.Nickname(ms.client.ServerID, userId)
 
 	body := &NicknameResponse{
 		Nickname: nickname,
@@ -124,7 +141,7 @@ func (ms *membersService) UpdateMemberNickname(userId string, nickname string) (
 }
 
 func (ms *membersService) DeleteMemberNickname(userId string) error {
-	endpoint := endpoints.MemberNicknameEndpoint(ms.client.ServerID, userId)
+	endpoint := ms.endpoints.Nickname(ms.client.ServerID, userId)
 
 	_, err := ms.client.DeleteRequest(endpoint)
 	if err != nil {
@@ -135,7 +152,7 @@ func (ms *membersService) DeleteMemberNickname(userId string) error {
 }
 
 func (ms *membersService) GetServerMember(serverId string, userId string) (*ServerMember, error) {
-	endpoint := endpoints.ServerMemberEndpoint(serverId, userId)
+	endpoint := ms.endpoints.Ban(serverId, userId)
 
 	var member ServerMemberResponse
 	err := ms.client.GetRequestV2(endpoint, &member)
@@ -148,7 +165,7 @@ func (ms *membersService) GetServerMember(serverId string, userId string) (*Serv
 }
 
 func (ms *membersService) KickMember(userId string) error {
-	endpoint := endpoints.ServerMemberEndpoint(ms.client.ServerID, userId)
+	endpoint := ms.endpoints.GetMember(ms.client.ServerID, userId)
 
 	_, err := ms.client.DeleteRequest(endpoint)
 	if err != nil {
@@ -159,7 +176,7 @@ func (ms *membersService) KickMember(userId string) error {
 }
 
 func (ms *membersService) BanMember(userId string, reason string) (*ServerMemberBan, error) {
-	endpoint := endpoints.MemberBanEndpoint(ms.client.ServerID, userId)
+	endpoint := ms.endpoints.Ban(ms.client.ServerID, userId)
 
 	// No need to build a struct here
 	body := map[string]string{
@@ -177,7 +194,7 @@ func (ms *membersService) BanMember(userId string, reason string) (*ServerMember
 
 func (ms *membersService) IsMemberBanned(userId string) (*ServerMemberBan, error) {
 	// Do we want to use the serverID from the config, or manually input it?
-	endpoint := endpoints.ServerMemberEndpoint(ms.client.ServerID, userId)
+	endpoint := ms.endpoints.Ban(ms.client.ServerID, userId)
 
 	var ban ServerMemberBan
 	err := ms.client.GetRequestV2(endpoint, &ban)
@@ -189,7 +206,7 @@ func (ms *membersService) IsMemberBanned(userId string) (*ServerMemberBan, error
 }
 
 func (ms *membersService) UnbanMember(userId string) error {
-	endpoint := endpoints.MemberBanEndpoint(ms.client.ServerID, userId)
+	endpoint := ms.endpoints.Ban(ms.client.ServerID, userId)
 
 	_, err := ms.client.DeleteRequest(endpoint)
 	if err != nil {
@@ -201,7 +218,7 @@ func (ms *membersService) UnbanMember(userId string) error {
 }
 
 func (ms *membersService) GetServerMembers() (*[]ServerMemberSummary, error) {
-	endpoint := endpoints.MemberEndpoint(ms.client.ServerID)
+	endpoint := ms.endpoints.GetMembers(ms.client.ServerID)
 
 	var members []ServerMemberSummary
 	err := ms.client.GetRequestV2(endpoint, &members)

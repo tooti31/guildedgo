@@ -3,8 +3,6 @@ package guildedgo
 import (
 	"errors"
 	"fmt"
-
-	"github.com/itschip/guildedgo/endpoints"
 )
 
 type Server struct {
@@ -30,14 +28,21 @@ type ServerService interface {
 	GetServer(serverId string) (*Server, error)
 }
 
+type serverEndpoints struct{}
+
+func (e *serverEndpoints) Server(serverId string) string {
+	return guildedApi + "/servers/" + serverId
+}
+
 type serverService struct {
-	client *Client
+	client    *Client
+	endpoints *serverEndpoints
 }
 
 var _ ServerService = &serverService{}
 
 func (ss *serverService) GetServer(serverId string) (*Server, error) {
-	endpoint := endpoints.ServerEndpoint(serverId)
+	endpoint := ss.endpoints.Server(serverId)
 
 	var server ServerResponse
 	err := ss.client.GetRequestV2(endpoint, &server)

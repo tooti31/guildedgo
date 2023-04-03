@@ -100,6 +100,10 @@ func (e *channelEndpoints) Message(channelId string) string {
 	return guildedApi + "/channels/" + channelId + "/messages"
 }
 
+func (e *channelEndpoints) ChannelMessages(channelId string) string {
+	return guildedApi + "/channels/" + channelId + "/messages"
+}
+
 func (e *channelEndpoints) MessageID(channelId string, messageId string) string {
 	return guildedApi + "/channels/" + channelId + "/messages/" + messageId
 }
@@ -147,7 +151,6 @@ func (cs *channelService) GetChannel(channelId string) (*ServerChannel, error) {
 }
 
 // UpdateChannel returns the updated channel.
-// Only server channels are supported at this time (coming soon™: DM Channels!)
 func (cs *channelService) UpdateChannel(channelId string, channelObject *UpdateChannelObject) (*ServerChannel, error) {
 	endpoint := cs.endpoints.Get(channelId)
 
@@ -208,7 +211,7 @@ func (cs *channelService) UpdateChannelMessage(channelId string, messageId strin
 
 // GetMessages TODO: add support for params
 func (cs *channelService) GetMessages(channelId string, getObject *GetMessagesObject) (*[]ChatMessage, error) {
-	endpoint := endpoints.GetChannelMessagesEndpoint(channelId)
+	endpoint := cs.endpoints.ChannelMessages(channelId)
 
 	resp, err := cs.client.GetRequest(endpoint)
 	if err != nil {
