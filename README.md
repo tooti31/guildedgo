@@ -5,29 +5,8 @@ A guilded.gg library in Go
 ## Getting started
 
 ```cmd
-go get github.com/itschip/guildedgo
+go get -u github.com/itschip/guildedgo
 ```
-
-## TODO
-
-- [x] Channels
-- [x] Servers
-- [x] Messaging
-- [x] Members
-- [x] Member bans
-- [x] Forums
-- [x] Forum comments
-- [x] List items
-- [x] Docs
-- [x] Calendar events
-- [x] Reactions
-- [x] Server XP
-- [ ] Social links
-- [ ] Group membership
-- [ ] Role membership
-- [x] Webhooks
-- [ ] Doc comments
-- [ ] Emote
 
 ## Examples
 
@@ -70,6 +49,7 @@ func main() {
 ```
 
 ### Command builder
+
 ```go
 serverID := internal.GetEnv("SERVER_ID")
 	token := internal.GetEnv("TOKEN")
@@ -110,4 +90,3 @@ serverID := internal.GetEnv("SERVER_ID")
 
 	c.Open()
 ```
-
