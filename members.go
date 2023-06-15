@@ -152,7 +152,7 @@ func (ms *membersService) DeleteMemberNickname(userId string) error {
 }
 
 func (ms *membersService) GetServerMember(serverId string, userId string) (*ServerMember, error) {
-	endpoint := ms.endpoints.Ban(serverId, userId)
+	endpoint := ms.endpoints.GetMember(serverId, userId)
 
 	var member ServerMemberResponse
 	err := ms.client.GetRequestV2(endpoint, &member)
