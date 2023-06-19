@@ -32,7 +32,7 @@ type ChatMessage struct {
 	// If set, this message did not notify mention or reply recipients (default false)
 	IsSilent bool `json:"isSilent,omitempty"`
 
-	Mentions `json:"mentions,omitempty"`
+	Mentions []string `json:"mentions,omitempty"`
 
 	// The ISO 8601 timestamp that the message was created at.
 	CreatedAt string `json:"createdAt"`
